@@ -411,11 +411,15 @@ function startCustomQuiz() {
     return alert('Add at least one custom question in the selected category before starting the quiz.');
   }
 
-  const quizQuestions = customQuestions.map((question) => ({
-    prompt: question.prompt,
-    options: shuffle(question.options.slice()),
-    correctIndex: question.options.indexOf(question.options[question.correctIndex]),
-  }));
+  const quizQuestions = customQuestions.map((question) => {
+    const shuffled = shuffle(question.options.slice());
+    const correctText = question.options[question.correctIndex];
+    return {
+      prompt: question.prompt,
+      options: shuffled,
+      correctIndex: shuffled.indexOf(correctText),
+    };
+  });
 
   state.currentQuiz = shuffle(quizQuestions).slice(0, 7);
   state.activeQuestionIndex = 0;
