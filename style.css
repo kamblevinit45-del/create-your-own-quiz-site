@@ -187,7 +187,7 @@ button:hover {
 
 .quiz-card {
   display: grid;
-  gap: 18px;
+  gap: 22px;
 }
 
 .quiz-card h3 {
@@ -196,7 +196,7 @@ button:hover {
 
 .options {
   display: grid;
-  gap: 12px;
+  gap: 14px;
 }
 
 .option-button {
@@ -232,6 +232,7 @@ button:hover {
 
 .status {
   font-weight: 700;
+  margin-top: 10px;
 }
 
 .button-row,
@@ -240,6 +241,7 @@ button:hover {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
+  margin-top: 20px;
 }
 
 .badge {
