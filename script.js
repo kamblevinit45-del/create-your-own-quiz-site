@@ -469,4 +469,13 @@ function attachEvents() {
   });
 }
 
-attachEvents();
+function initializeApp() {
+  attachEvents();
+  showScreen('login');
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initializeApp);
+} else {
+  initializeApp();
+}
