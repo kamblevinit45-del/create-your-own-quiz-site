@@ -36,6 +36,7 @@ const state = {
   customQuestions: [],
   usedQuestionIds: new Set(),
   lastScore: null,
+  lastQuizSize: null,
   activeQuestionIndex: 0,
   selectedAnswer: null,
 };
@@ -121,8 +122,8 @@ function createMathQuestion(type, age, maxNumber, precision) {
     correct = a + b;
     prompt = `What is ${a} + ${b}?`;
   } else if (type === 'subtraction') {
-    correct = a + b;
-    prompt = `What is ${correct} - ${b}?`;
+    correct = a;
+    prompt = `What is ${a + b} - ${b}?`;
   } else if (type === 'multiplication') {
     correct = a * b;
     prompt = `What is ${a} × ${b}?`;
@@ -131,9 +132,7 @@ function createMathQuestion(type, age, maxNumber, precision) {
     correct = a;
     prompt = `What is ${product} ÷ ${b}?`;
   } else if (type === 'fraction') {
-    correct = a;
-    prompt = `If you have ${a}/${b} of a pizza, what is the top number called?`;
-    return buildQuestion(prompt, ['Numerator', 'Denominator', 'Fraction', 'Pizza'], 0);
+    return buildQuestion(`If you have ${a}/${b} of a pizza, what is the top number called?`, ['Numerator', 'Denominator', 'Fraction', 'Pizza'], 0);
   } else if (type === 'percent') {
     correct = 10 * a;
     prompt = `What is ${a * 10}% of 100?`;
@@ -151,7 +150,7 @@ function createMathQuestion(type, age, maxNumber, precision) {
   return { prompt, options, correctIndex: options.indexOf(String(correct)) };
 }
 
-function createAnswerOptions(correct, type) {
+function createAnswerOptions(correct) {
   const answers = new Set([String(correct)]);
   while (answers.size < 4) {
     const offset = randomBetween(1, Math.max(2, Math.floor(Math.abs(correct) / 2) + 2));
@@ -162,7 +161,10 @@ function createAnswerOptions(correct, type) {
 }
 
 function buildQuestion(prompt, options, correctIndex) {
-  return { prompt, options: shuffle(options.slice()), correctIndex };
+  const shuffled = shuffle(options.slice());
+  const correctText = options[correctIndex];
+  const finalIndex = shuffled.indexOf(correctText);
+  return { prompt, options: shuffled, correctIndex: finalIndex };
 }
 
 function shuffle(array) {
@@ -243,20 +245,18 @@ function generateQuiz(categoryKey, age, count) {
   const used = state.usedQuestionIds;
   const available = templates[categoryKey][difficulty];
 
-  while (questions.length < count) {
+  let attempts = 0;
+  while (questions.length < count && attempts < count * 10) {
     const template = available[randomBetween(0, available.length - 1)];
     const question = template(age);
     const questionId = `${categoryKey}|${difficulty}|${question.prompt}`;
-    if (used.has(questionId)) {
-      if (questions.length >= available.length) {
-        // Accept duplicates if cover all unique templates.
-        questions.push(question);
-        continue;
-      }
-      continue;
+    if (!used.has(questionId)) {
+      used.add(questionId);
+      questions.push(question);
+    } else if (questions.length + 1 > available.length) {
+      questions.push(question);
     }
-    used.add(questionId);
-    questions.push(question);
+    attempts += 1;
   }
 
   return questions;
@@ -302,8 +302,6 @@ function chooseAnswer(index, button) {
   });
 
   const isCorrect = index === question.correctIndex;
-  button.classList.add(isCorrect ? 'correct' : 'incorrect');
-
   const answerButtons = Array.from(document.querySelectorAll('.option-button'));
   answerButtons.forEach((btn, btnIndex) => {
     btn.disabled = true;
@@ -317,9 +315,7 @@ function chooseAnswer(index, button) {
   }
 
   if (isCorrect) {
-    if (!state.currentQuiz[state.activeQuestionIndex].answeredCorrectly) {
-      state.currentQuiz[state.activeQuestionIndex].answeredCorrectly = true;
-    }
+    question.answeredCorrectly = true;
   }
 
   showAnswerResult(isCorrect, question.options[question.correctIndex]);
@@ -335,8 +331,8 @@ function showAnswerResult(isCorrect, correctAnswer) {
 
 function updateProgress() {
   const completed = state.activeQuestionIndex;
-  const total = state.currentQuiz.length;
-  quizProgress.innerHTML = `<span style="width: ${Math.round(((completed) / total) * 100)}%"></span>`;
+  const total = state.currentQuiz?.length || 1;
+  quizProgress.innerHTML = `<span style="width: ${Math.round((completed / total) * 100)}%"></span>`;
 }
 
 function nextQuestion() {
@@ -351,10 +347,11 @@ function nextQuestion() {
 
 function finishQuiz() {
   const correctCount = state.currentQuiz.reduce((count, question) => {
-    const correctButton = question.answeredCorrectly ? 1 : 0;
-    return count + correctButton;
+    return count + (question.answeredCorrectly ? 1 : 0);
   }, 0);
+
   state.lastScore = correctCount;
+  state.lastQuizSize = state.currentQuiz.length;
   document.getElementById('final-score-text').textContent = `You scored ${correctCount} out of ${state.currentQuiz.length}.`;
   showScreen('final');
 }
@@ -382,11 +379,17 @@ function addCustomQuestion() {
     return alert('Please complete the custom question and all four answer options.');
   }
 
-  state.customQuestions.push({ category, difficulty, prompt, options, correctIndex, id: `custom-${Date.now()}-${state.customQuestions.length}` });
+  state.customQuestions.push({
+    category,
+    difficulty,
+    prompt,
+    options,
+    correctIndex,
+    id: `custom-${Date.now()}-${state.customQuestions.length}`,
+  });
+
   renderCustomQuestionList();
   customQuestionForm.reset();
-  customQuestionForm.querySelector('#custom-category').value = 'math';
-  customQuestionForm.querySelector('#custom-difficulty').value = 'easy';
 }
 
 function renderCustomQuestionList() {
@@ -396,7 +399,7 @@ function renderCustomQuestionList() {
   }
 
   customQuestionList.innerHTML = state.customQuestions
-    .map((question, index) => `<li><strong>${question.category.toUpperCase()}</strong> (${question.difficulty}) — ${question.prompt}</li>`)
+    .map((question) => `<li><strong>${question.category.toUpperCase()}</strong> (${question.difficulty}) — ${question.prompt}</li>`)
     .join('');
 }
 
@@ -410,8 +413,8 @@ function startCustomQuiz() {
 
   const quizQuestions = customQuestions.map((question) => ({
     prompt: question.prompt,
-    options: question.options.slice(),
-    correctIndex: question.correctIndex,
+    options: shuffle(question.options.slice()),
+    correctIndex: question.options.indexOf(question.options[question.correctIndex]),
   }));
 
   state.currentQuiz = shuffle(quizQuestions).slice(0, 7);
@@ -430,7 +433,7 @@ function viewLastScore() {
   if (state.lastScore === null) {
     alert('You have not finished a quiz yet.');
   } else {
-    alert(`Your last score was ${state.lastScore} out of ${state.currentQuiz.length}.`);
+    alert(`Your last score was ${state.lastScore} out of ${state.lastQuizSize}.`);
   }
 }
 
