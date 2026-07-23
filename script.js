@@ -196,8 +196,12 @@ function getCategoryLabel(categoryKey) {
 }
 
 function showScreen(screenKey) {
-  Object.values(screens).forEach((screen) => screen.classList.add('hidden'));
+  Object.values(screens).forEach((screen) => {
+    screen.classList.add('hidden');
+    screen.classList.remove('active-screen');
+  });
   screens[screenKey].classList.remove('hidden');
+  screens[screenKey].classList.add('active-screen');
 }
 
 function login(event) {
