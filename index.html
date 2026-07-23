@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create Your Own Quiz</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header>
+      <h1>Create Your Own Quiz</h1>
+      <p>Build a quiz, then take it immediately in your browser.</p>
+    </header>
+
+    <main>
+      <section class="panel" id="builder-panel">
+        <h2>Quiz Builder</h2>
+        <div class="builder-grid">
+          <label>
+            Question text
+            <textarea id="question-text" rows="3" placeholder="Enter your question"></textarea>
+          </label>
+
+          <div class="option-inputs">
+            <label>Option 1 <input type="text" class="option-input" id="option-1" placeholder="Answer option 1" /></label>
+            <label>Option 2 <input type="text" class="option-input" id="option-2" placeholder="Answer option 2" /></label>
+            <label>Option 3 <input type="text" class="option-input" id="option-3" placeholder="Answer option 3" /></label>
+            <label>Option 4 <input type="text" class="option-input" id="option-4" placeholder="Answer option 4" /></label>
+          </div>
+
+          <label class="select-label">
+            Correct option
+            <select id="correct-option">
+              <option value="1">Option 1</option>
+              <option value="2">Option 2</option>
+              <option value="3">Option 3</option>
+              <option value="4">Option 4</option>
+            </select>
+          </label>
+
+          <div class="builder-actions">
+            <button id="add-question">Add Question</button>
+            <button id="start-quiz" class="primary">Start Quiz</button>
+          </div>
+        </div>
+
+        <div id="question-list" class="question-list">
+          <h3>Questions added</h3>
+          <ol id="question-list-items"></ol>
+        </div>
+      </section>
+
+      <section class="panel hidden" id="quiz-panel">
+        <h2>Quiz</h2>
+        <div id="quiz-content"></div>
+      </section>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
