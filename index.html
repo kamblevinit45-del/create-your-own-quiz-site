@@ -3,57 +3,161 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Create Your Own Quiz</title>
+  <title>Kids Quiz Galaxy</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="app-shell">
     <header>
-      <h1>Create Your Own Quiz</h1>
-      <p>Build a quiz, then take it immediately in your browser.</p>
+      <h1>Kids Quiz Galaxy</h1>
+      <p>Safe, colorful quizzes for kids under 18. Login first, choose a category, and let the quiz generate questions automatically.</p>
     </header>
 
     <main>
-      <section class="panel" id="builder-panel">
-        <h2>Quiz Builder</h2>
-        <div class="builder-grid">
-          <label>
-            Question text
-            <textarea id="question-text" rows="3" placeholder="Enter your question"></textarea>
-          </label>
-
-          <div class="option-inputs">
-            <label>Option 1 <input type="text" class="option-input" id="option-1" placeholder="Answer option 1" /></label>
-            <label>Option 2 <input type="text" class="option-input" id="option-2" placeholder="Answer option 2" /></label>
-            <label>Option 3 <input type="text" class="option-input" id="option-3" placeholder="Answer option 3" /></label>
-            <label>Option 4 <input type="text" class="option-input" id="option-4" placeholder="Answer option 4" /></label>
-          </div>
-
-          <label class="select-label">
-            Correct option
-            <select id="correct-option">
-              <option value="1">Option 1</option>
-              <option value="2">Option 2</option>
-              <option value="3">Option 3</option>
-              <option value="4">Option 4</option>
-            </select>
-          </label>
-
-          <div class="builder-actions">
-            <button id="add-question">Add Question</button>
-            <button id="start-quiz" class="primary">Start Quiz</button>
-          </div>
-        </div>
-
-        <div id="question-list" class="question-list">
-          <h3>Questions added</h3>
-          <ol id="question-list-items"></ol>
+      <section id="login-screen" class="screen active-screen">
+        <div class="panel auth-panel">
+          <h2>Login</h2>
+          <form id="login-form" class="form-grid">
+            <label>
+              Username
+              <input type="text" id="username" placeholder="Your name" required />
+            </label>
+            <label>
+              Password
+              <input type="password" id="password" placeholder="Create a password" required />
+            </label>
+            <label>
+              Age
+              <input type="number" id="age" placeholder="6 to 17" min="6" max="17" required />
+            </label>
+            <button type="submit" class="primary">Login</button>
+          </form>
+          <p class="help-text">The quiz will tailor questions and difficulty to your age.</p>
         </div>
       </section>
 
-      <section class="panel hidden" id="quiz-panel">
-        <h2>Quiz</h2>
-        <div id="quiz-content"></div>
+      <section id="category-screen" class="screen hidden">
+        <div class="panel">
+          <div class="screen-header">
+            <div>
+              <h2>Choose a Quiz</h2>
+              <p class="subtitle">Welcome, <span id="player-name"></span>! Age group: <span id="player-age"></span></p>
+            </div>
+          </div>
+
+          <div class="category-grid">
+            <button class="category-button" data-category="math">Maths</button>
+            <button class="category-button" data-category="gk">General Knowledge</button>
+            <button class="category-button" data-category="science">Science</button>
+            <button class="category-button" data-category="history">History</button>
+          </div>
+
+          <div class="extra-actions">
+            <button id="create-quiz-button" class="secondary">Create a New Quiz</button>
+            <button id="view-scores-button" class="secondary">View Last Score</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="builder-screen" class="screen hidden">
+        <div class="panel">
+          <div class="screen-header">
+            <div>
+              <h2>Create Your Own Quiz</h2>
+              <p class="subtitle">Add your own question for a custom game. Each quiz is stored for the session only.</p>
+            </div>
+          </div>
+
+          <form id="custom-question-form" class="form-grid">
+            <label>
+              Category
+              <select id="custom-category">
+                <option value="math">Maths</option>
+                <option value="gk">General Knowledge</option>
+                <option value="science">Science</option>
+                <option value="history">History</option>
+              </select>
+            </label>
+            <label>
+              Difficulty
+              <select id="custom-difficulty">
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+              </select>
+            </label>
+            <label>
+              Question text
+              <textarea id="custom-question" rows="3" placeholder="Enter your quiz question"></textarea>
+            </label>
+            <label>
+              Option 1
+              <input type="text" id="custom-option-1" placeholder="Answer option 1" />
+            </label>
+            <label>
+              Option 2
+              <input type="text" id="custom-option-2" placeholder="Answer option 2" />
+            </label>
+            <label>
+              Option 3
+              <input type="text" id="custom-option-3" placeholder="Answer option 3" />
+            </label>
+            <label>
+              Option 4
+              <input type="text" id="custom-option-4" placeholder="Answer option 4" />
+            </label>
+            <label>
+              Correct option
+              <select id="custom-correct">
+                <option value="1">Option 1</option>
+                <option value="2">Option 2</option>
+                <option value="3">Option 3</option>
+                <option value="4">Option 4</option>
+              </select>
+            </label>
+
+            <div class="builder-actions">
+              <button type="button" id="add-custom-question" class="primary">Add Question</button>
+              <button type="button" id="start-custom-quiz" class="secondary">Start Custom Quiz</button>
+              <button type="button" id="back-to-categories">Back</button>
+            </div>
+          </form>
+
+          <div class="question-list">
+            <h3>Custom questions</h3>
+            <ol id="custom-question-list"><li>No custom questions added yet.</li></ol>
+          </div>
+        </div>
+      </section>
+
+      <section id="quiz-screen" class="screen hidden">
+        <div class="panel">
+          <div class="quiz-header">
+            <div>
+              <h2 id="quiz-title">Quiz</h2>
+              <p class="subtitle">Answer questions and see instant feedback after each selection.</p>
+            </div>
+            <div id="quiz-difficulty" class="badge"></div>
+          </div>
+
+          <div id="quiz-progress" class="progress"></div>
+          <div id="quiz-question-card" class="quiz-card"></div>
+          <div class="quiz-actions">
+            <button id="next-question-button" class="primary hidden">Next Question</button>
+            <button id="cancel-quiz-button" class="secondary">Cancel</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="final-screen" class="screen hidden">
+        <div class="panel">
+          <h2>Quiz Complete</h2>
+          <p id="final-score-text"></p>
+          <div class="button-row">
+            <button id="play-again-button" class="primary">Play Again</button>
+            <button id="back-home-button" class="secondary">Back Home</button>
+          </div>
+        </div>
       </section>
     </main>
   </div>
