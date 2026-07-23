@@ -225,6 +225,12 @@ function login(event) {
 }
 
 function startQuiz(categoryKey, fixedQuestions = null) {
+  if (!state.player) {
+    alert('Please log in first to select a subject.');
+    showScreen('login');
+    return;
+  }
+
   const categoryLabel = getCategoryLabel(categoryKey);
   const difficulty = getDifficulty(state.player.age);
   quizTitle.textContent = `${categoryLabel} Quiz`;
@@ -361,7 +367,7 @@ function finishQuiz() {
 }
 
 function cancelQuiz() {
-  if (!confirm('Do you want to return to the categories screen? Your current quiz progress will be lost.')) {
+  if (!confirm('Do you want to return to the categories screen? Your current quiz progress will be lost?')) {
     return;
   }
   showScreen('categories');
@@ -454,19 +460,48 @@ function backHome() {
 }
 
 function attachEvents() {
-  loginForm.addEventListener('submit', login);
-  createQuizButton.addEventListener('click', () => showScreen('builder'));
-  viewScoresButton.addEventListener('click', viewLastScore);
-  backToCategories.addEventListener('click', () => showScreen('categories'));
-  addCustomQuestionButton.addEventListener('click', addCustomQuestion);
-  startCustomQuizButton.addEventListener('click', startCustomQuiz);
-  nextQuestionButton.addEventListener('click', nextQuestion);
-  cancelQuizButton.addEventListener('click', cancelQuiz);
-  playAgainButton.addEventListener('click', playAgain);
-  backHomeButton.addEventListener('click', backHome);
+  if (loginForm) {
+    loginForm.addEventListener('submit', login);
+  }
+  if (createQuizButton) {
+    createQuizButton.addEventListener('click', () => showScreen('builder'));
+  }
+  if (viewScoresButton) {
+    viewScoresButton.addEventListener('click', viewLastScore);
+  }
+  if (backToCategories) {
+    backToCategories.addEventListener('click', () => showScreen('categories'));
+  }
+  if (addCustomQuestionButton) {
+    addCustomQuestionButton.addEventListener('click', addCustomQuestion);
+  }
+  if (startCustomQuizButton) {
+    startCustomQuizButton.addEventListener('click', startCustomQuiz);
+  }
+  if (nextQuestionButton) {
+    nextQuestionButton.addEventListener('click', nextQuestion);
+  }
+  if (cancelQuizButton) {
+    cancelQuizButton.addEventListener('click', cancelQuiz);
+  }
+  if (playAgainButton) {
+    playAgainButton.addEventListener('click', playAgain);
+  }
+  if (backHomeButton) {
+    backHomeButton.addEventListener('click', backHome);
+  }
   document.querySelectorAll('.category-button').forEach((button) => {
     button.addEventListener('click', () => startQuiz(button.dataset.category));
   });
 }
 
-attachEvents();
+function initializeApp() {
+  attachEvents();
+  showScreen('login');
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initializeApp);
+} else {
+  initializeApp();
+}
