@@ -146,7 +146,7 @@ function createMathQuestion(type, age, maxNumber, precision) {
     prompt = `What is ${x} + ${y}?`;
   }
 
-  const options = createAnswerOptions(correct, type);
+  const options = createAnswerOptions(correct);
   return { prompt, options, correctIndex: options.indexOf(String(correct)) };
 }
 
@@ -196,10 +196,16 @@ function getCategoryLabel(categoryKey) {
 }
 
 function showScreen(screenKey) {
+  if (!screens[screenKey]) {
+    console.warn(`Cannot show unknown screen: ${screenKey}`);
+    return;
+  }
+
   Object.values(screens).forEach((screen) => {
     screen.classList.add('hidden');
     screen.classList.remove('active-screen');
   });
+
   screens[screenKey].classList.remove('hidden');
   screens[screenKey].classList.add('active-screen');
 }
@@ -231,6 +237,11 @@ function startQuiz(categoryKey, fixedQuestions = null) {
     return;
   }
 
+  if (!templates[categoryKey]) {
+    alert('Please choose a valid quiz subject.');
+    return;
+  }
+
   const categoryLabel = getCategoryLabel(categoryKey);
   const difficulty = getDifficulty(state.player.age);
   quizTitle.textContent = `${categoryLabel} Quiz`;
@@ -251,6 +262,11 @@ function startQuiz(categoryKey, fixedQuestions = null) {
 
 function generateQuiz(categoryKey, age, count) {
   const difficulty = getDifficulty(age);
+
+  if (!templates[categoryKey] || !templates[categoryKey][difficulty]) {
+    return [];
+  }
+
   const questions = [];
   const used = state.usedQuestionIds;
   const available = templates[categoryKey][difficulty];
@@ -375,7 +391,6 @@ function cancelQuiz() {
 
 function addCustomQuestion() {
   const category = customQuestionForm.querySelector('#custom-category').value;
-  const difficulty = customQuestionForm.querySelector('#custom-difficulty').value;
   const prompt = customQuestionForm.querySelector('#custom-question').value.trim();
   const options = [
     customQuestionForm.querySelector('#custom-option-1').value.trim(),
@@ -391,7 +406,7 @@ function addCustomQuestion() {
 
   state.customQuestions.push({
     category,
-    difficulty,
+    difficulty: customQuestionForm.querySelector('#custom-difficulty').value,
     prompt,
     options,
     correctIndex,
@@ -490,7 +505,9 @@ function attachEvents() {
   if (backHomeButton) {
     backHomeButton.addEventListener('click', backHome);
   }
+
   document.querySelectorAll('.category-button').forEach((button) => {
+    button.type = 'button';
     button.addEventListener('click', () => startQuiz(button.dataset.category));
   });
 }
