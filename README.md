@@ -1,20 +1,21 @@
-# Create Your Own Quiz Site
+# Kids Quiz Galaxy
 
-A simple static web app for building and taking custom quizzes in the browser.
+A child-friendly quiz game that works entirely in the browser. It includes:
 
-## Features
+- Login screen with username, password, and age verification for ages 6–17.
+- Category selection for Maths, General Knowledge, Science, and History.
+- Automatically generated quiz questions based on age and difficulty.
+- Unique questions during each session to avoid repetition.
+- A "Create Your Own Quiz" section for custom questions.
+- Instant correct/incorrect feedback after each answer.
 
-- Add multiple questions with four answer options.
-- Choose the correct answer for each question.
-- Start the quiz and receive a score at the end.
+## How it works
 
-## Running locally
+1. Open `index.html` in a browser.
+2. Login with a username, password, and age.
+3. Select a quiz category or create your own quiz.
+4. Answer questions and see your score at the end.
 
-1. Download or clone the repository.
-2. Open `index.html` in a browser.
-
-## Live site
-
-The website is published with GitHub Pages at:
+## Site
 
 https://kamblevinit45-del.github.io/create-your-own-quiz-site/
